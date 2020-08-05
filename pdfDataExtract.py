@@ -4,6 +4,9 @@ import PIL
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+import reportlab
 
 
 class Client:
@@ -72,32 +75,34 @@ def readPDFs():
     return clients
 
 def main():
+    reportlab.rl_config.warnOnMissingFontGlyphs = 0
+    pdfmetrics.registerFont(TTFont('AbhayaLibre-Regular', 'fonts/AbhayaLibre-Regular.ttf'))
     clients = readPDFs()
-    c = canvas.Canvas("Hello.pdf", pagesize=A4)
-   
-    c.setFont("Courier", 8)
-    for y in range(0, 30, 5):
-        for x in range(0, 20, 10):
-            # x = x + .5
-            try:
-                client = clients.pop()
-                c.drawImage(client.qrCode, x * cm, y * cm, width=3.6 * cm, height=3.6 * cm)
-                i = 0
-                for line in client.address:
-                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, line)
+    index = 0
+    while(len(clients) > 0):
+        c = canvas.Canvas(f"Output-{index}.pdf", pagesize=A4)
+        c.setFont("AbhayaLibre-Regular", 8)
+        for y in range(0, 30, 5):
+            for x in range(0, 20, 10):
+                try:
+                    client = clients.pop()
+                    c.drawImage(client.qrCode, x * cm, y * cm, width=3.6 * cm, height=3.6 * cm)
+                    i = 0
+                    for line in client.address:
+                        c.drawString((x+3.7) * cm, (y+3.5-i) * cm, line)
+                        i = i + .5
+                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'IBAN: {client.iban}')
                     i = i + .5
-                c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'IBAN: {client.iban}')
-                i = i + .5
-                c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'BIC: {client.bic}')
-                i = i + .5
-                c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Učet: {client.acc}')
-                i = i + .5
-                c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Variabilný symbol: {client.vs}')
-                i = i + .5
-                c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Suma: {client.amount}')
-            except:
-                pass
-    c.save()            
+                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'BIC: {client.bic}')
+                    i = i + .5
+                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Učet: {client.acc}')
+                    i = i + .5
+                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Variabilný symbol: {client.vs}')
+                    i = i + .5
+                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Suma: {client.amount}')
+                except:
+                    pass
+        c.save()            
 
 
 
