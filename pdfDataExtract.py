@@ -53,14 +53,15 @@ def getDataLines(doc, key, lines=1):
                 return text_lines[(num+1):(num+lines+1)]
     return ""
 
-def readPDFs():
+def readPDFs(prefix = "faktury/*.pdf"):
     clients = []
-    for pdfFile in glob.glob("faktury/*.pdf"):
+    for pdfFile in glob.glob(prefix):
         doc = fitz.open(pdfFile)
         # QR code
         qr = getQRcode(doc, pdfFile)
         # K úhrade
-        amount = getData(doc, "K úhrade\n")
+        amount = getData(doc, "K úhrade\n").split(" ")
+        amount = amount[0]
         # address
         addr = getDataLines(doc, "Slovensko", 3)
         # IBAN & Ucet
@@ -74,35 +75,42 @@ def readPDFs():
         clients.append(Client(qr, addr, amount, iban, ucet, bic, vs))
     return clients
 
+
 def main():
     reportlab.rl_config.warnOnMissingFontGlyphs = 0
-    pdfmetrics.registerFont(TTFont('AbhayaLibre-Regular', 'fonts/AbhayaLibre-Regular.ttf'))
-    clients = readPDFs()
-    index = 0
+    pdfmetrics.registerFont(TTFont('AbhayaLibre-Regular', 'fonts/AbhayaLibre-Regular.ttf')) # imports text font that can handle all the Slovak letters
+    pdfmetrics.registerFont(TTFont('AbhayaLibre-Bold', 'fonts/AbhayaLibre-Bold.ttf'))
+    clients = readPDFs()    # Process all the file with prefix. Default is 'faktury/*.pdf'
+    index = 0   # Name of the output PDF file
+    line_margin = 0.4 # distance between the text lines on a card
     while(len(clients) > 0):
         c = canvas.Canvas(f"Output-{index}.pdf", pagesize=A4)
-        c.setFont("AbhayaLibre-Regular", 8)
-        for y in range(0, 30, 5):
-            for x in range(0, 20, 10):
+        c.setFont("AbhayaLibre-Bold", 8)
+        for y in range(0, 30, 5):   # y coordinate of the card as a block on a A4 paper(in cm)  (0, 30, 6) will maked 5 rows instead of 6
+            for x in range(0, 20, 11):  # x coordinate of the card as a block on a A4 paper(in cm) 
                 try:
-                    client = clients.pop()
-                    c.drawImage(client.qrCode, x * cm, y * cm, width=3.6 * cm, height=3.6 * cm)
-                    i = 0
-                    for line in client.address:
-                        c.drawString((x+3.7) * cm, (y+3.5-i) * cm, line)
-                        i = i + .5
-                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'IBAN: {client.iban}')
-                    i = i + .5
-                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'BIC: {client.bic}')
-                    i = i + .5
-                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Učet: {client.acc}')
-                    i = i + .5
-                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Variabilný symbol: {client.vs}')
-                    i = i + .5
-                    c.drawString((x+3.7) * cm, (y+3.5-i) * cm, f'Suma: {client.amount}')
+                    client = clients.pop()  # Pops out the client details if are no Cients left just passes
+                    c.drawImage(client.qrCode, x * cm, (y + .2) * cm, width=3.6 * cm, height=3.6 * cm)  # draws QR code image. Please note the dimentions (3.6 by 3.6 cm)
+                    line = 0
+                    c.setFont("AbhayaLibre-Bold", 10)
+                    c.drawString((x+3.7) * cm, (y+3.5-line) * cm, f'IBAN :')
+                    line = line + line_margin
+                    c.setFont("AbhayaLibre-Bold", 13)
+                    c.drawString((x+3.7) * cm, (y+3.5-line) * cm, f'{client.iban}')
+                    line = line + line_margin + 0.3
+                    c.setFont("AbhayaLibre-Bold", 10)
+                    c.drawString((x+3.7) * cm, (y+3.5-line) * cm, f'Variabilný symbol - {client.vs}')
+                    line = line + line_margin
+                    c.drawString((x+3.7) * cm, (y+3.5-line) * cm, f'Suma - € {client.amount}')
+                    line += .8
+                    c.setFont("AbhayaLibre-Bold", 8)
+                    for addr_line in client.address:
+                        c.drawString((x+3.7) * cm, (y+3.5-line) * cm, addr_line)
+                        line = line + line_margin
                 except:
                     pass
-        c.save()            
+        c.save()
+        index += 1
 
 
 
