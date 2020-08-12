@@ -166,4 +166,5 @@ $RECYCLE.BIN/
 
 # Private data
 *.png
+*.pdf
 faktury/*.pdf

@@ -86,6 +86,7 @@ def main():
     c = canvas.Canvas("Output.pdf", pagesize=A4)
     while(len(clients) > 0):
         c.setFont("AbhayaLibre-Bold", 8)
+        count = 0
         for y in range(0, 30, 5):   # y coordinate of the card as a block on a A4 paper(in cm)  (0, 30, 6) will maked 5 rows instead of 6
             y += .3
             for x in range(0, 20, 10):  # x coordinate of the card as a block on a A4 paper(in cm) 
@@ -109,26 +110,30 @@ def main():
                     for addr_line in client.address:
                         c.drawString((x+3.7) * cm, (y+3.5-line) * cm, addr_line)
                         line = line + line_margin
+                    count += 1
                 except:
                     pass
         c.showPage()
         ## BACK-SIDE
         ##
+        bk_count = 0
         c.setFont("AbhayaLibre-Bold", 8)
         for y in range(0, 30, 5):   # y coordinate of the card as a block on a A4 paper(in cm)  (0, 30, 6) will maked 5 rows instead of 6
             for x in range(3, 20, 10):  # x coordinate of the card as a block on a A4 paper(in cm) 
                 try:
                     line = 1
-                    c.setFont("AbhayaLibre-Bold", 14)
-                    c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'Pri strate - poplatok 3€')
-                    line = line + line_margin
-                    c.setFont("AbhayaLibre-Bold", 12)
-                    c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'za vystavenie novej kartičky.')
-                    line = line + line_margin + 0.3
-                    c.setFont("AbhayaLibre-Bold", 8)
-                    c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'Pri zmene programu je potrebné si vyžiadať novú kartičku.')
-                    line = line + line_margin
-                    c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'Bez poplatku.')
+                    if (bk_count <= count):
+                        c.setFont("AbhayaLibre-Bold", 14)
+                        c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'Pri strate - poplatok 3€')
+                        line = line + line_margin
+                        c.setFont("AbhayaLibre-Bold", 12)
+                        c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'za vystavenie novej kartičky.')
+                        line = line + line_margin + 0.3
+                        c.setFont("AbhayaLibre-Bold", 8)
+                        c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'Pri zmene programu je potrebné si vyžiadať novú kartičku.')
+                        line = line + line_margin
+                        c.drawString((x+.7) * cm, (y+3.5-line) * cm, 'Bez poplatku.')
+                    bk_count += 1
                 except:
                     pass
         c.showPage()
