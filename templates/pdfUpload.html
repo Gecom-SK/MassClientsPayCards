@@ -1,0 +1,34 @@
+<!doctype html>
+
+
+<html>
+    <head>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/pdfUpload.js') }}"></script>
+        <link href="{{ url_for('static', filename='css/pdfUpload.css') }}" rel="stylesheet">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    </head>
+    <body>
+        <h1 style="text-align:center">Platobne karticky s QR kodom</h1>
+        <p style="text-align:center">Tento skript berie plnu vytlacenu fakturu/y v pdf formate a vytvara z nej karticku do penazenky pre zakaznika.</p>
+        <br>
+        <title>Upload new File</title>
+        <h1>Faktury na spracovanie...</h1>
+        <form action="" method=post enctype=multipart/form-data>
+            <p>
+                <input type=file name="files[]"" multiple>
+                <input type="checkbox" name="address">
+                <a style="text-align:left">Adressa pre obalku</a>
+                <input style="width: 2cm; height: 2cm; margin-inline-start: 3cm;" type=submit value=Spracuj...>
+                <br>
+                <br>
+            </p>
+        </form>
+        <p style="font-size:large">Po spracovani sa QR kart-a/y automaticky stiahne v pdf formate</p>
+        <br>
+        <br>
+    </body>
+    <footer>
+        <p>Kontakt: <a href="mailto:repickym@gecom.sk">repickym@gecom.sk</a>.</p>
+    </footer>
+    </html>

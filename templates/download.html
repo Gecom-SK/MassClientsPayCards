@@ -1,0 +1,11 @@
+<!doctype html>
+<head>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body class="body">
+    <title>Download File{{value}}</title>
+    <h1>Download File</h1>
+     <div class="container" align="left">
+      <a href="/return-files/{{value}}" target="blank"><button class='btn btn-default'>Download</button></a>
+     </div>
+  </body>
