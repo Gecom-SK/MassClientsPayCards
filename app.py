@@ -29,11 +29,12 @@ def processPDFs():
         pdfs = pbe.BillExtract()
         try:
             # Checks if the checkbox was checked for envelope formatted address print-out
-            addAddress = True if (request.form.get('address') == 'on') else addAddress = False
             # Reads all the pdf files from directory, process them and returns the filename of the output pdf file.
-            file_path = DOWNLOAD_FOLDER + qrCards.processClients(pdfs.readPDFs(), adresses=addAddress)
+            file_path = DOWNLOAD_FOLDER + qrCards.processClients(pdfs.readPDFs(), adresses=(request.form.get('address') == 'on'))
             #send file name as parameter to downlad
             return send_file(file_path, as_attachment=True, attachment_filename='QRcards.pdf')
+        except:
+            pass
     return render_template('pdfUpload.html')
 
 if __name__ == '__main__':
